@@ -12,12 +12,8 @@
 
  Другими словами: функция должна возвращать в неизменном виде то, что поступает ей на вход
  */
-function returnFirstArgument(value, param) {
-  if (param == undefined) {
+function returnFirstArgument(value) {
     return value;
-  } else {
-    return `${value} ${param}`;
-  }
 };
 
 /*
@@ -50,8 +46,6 @@ function returnFnResult(fn) {
   return fn();
 };
 
-function fn() { };
-
 /*
  Задание 4:
 
@@ -70,7 +64,7 @@ function returnCounter(number) {
     if (number == undefined) {
       number = 0;
     };
-    return number++ + 1;
+    return ++number;
   };
 };
 
