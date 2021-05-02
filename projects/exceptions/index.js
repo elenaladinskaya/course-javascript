@@ -17,15 +17,16 @@
    isAllTrue([100, 2, 3, 4, 5], n => n < 10) // вернет false
  */
 function isAllTrue(array, fn) {
-  if (!Array.isArray(array) || array.length == 0) {
-    throw new Error('empty array');
-  } else if (typeof fn != 'function') {
+  if (typeof fn !== 'function') {
     throw new Error('fn is not a function');
   }
 
-  for (let i = 0; i < array.length; i++) {
-    let isTrue = fn(array[i]);
-    if (!isTrue) {
+  if (!Array.isArray(array) || array.length == 0) {
+    throw new Error('empty array');
+  }
+
+  for (let el of array) {
+    if (!fn(el)) {
       return false;
     }
   }
@@ -49,15 +50,16 @@ function isAllTrue(array, fn) {
    isSomeTrue([1, 2, 3, 4, 5], n => n > 20) // вернет false
  */
 function isSomeTrue(array, fn) {
-  if (!Array.isArray(array) || array.length == 0) {
-    throw new Error('empty array');
-  } else if (typeof fn != 'function') {
+  if (typeof fn !== 'function') {
     throw new Error('fn is not a function');
   }
 
-  for (let i = 0; i < array.length; i++) {
-    let isTrue = fn(array[i]);
-    if (isTrue) {
+  if (!Array.isArray(array) || array.length == 0) {
+    throw new Error('empty array');
+  }
+
+  for (let el of array) {
+    if (fn(el)) {
       return true;
     }
   }
@@ -76,20 +78,20 @@ function isSomeTrue(array, fn) {
    - fn не является функцией (с текстом "fn is not a function")
  */
 function returnBadArguments(fn, ...args) {
-  if (typeof fn != 'function') {
+  if (typeof fn !== 'function') {
     throw new Error('fn is not a function');
   }
 
-  let arr = [];
+  let bad = [];
 
-  for (let arg of args) {
+  for (const arg of args) {
     try {
       fn(arg);
-    } catch (error) {
-      arr.push(arg);
+    } catch {
+      bad.push(arg);
     }
   }
-  return arr;
+  return bad;
 }
 
 /*
@@ -110,80 +112,47 @@ function returnBadArguments(fn, ...args) {
  - какой-либо из аргументов div является нулем (с текстом "division by 0")
  */
 function calculator(number = 0) {
-  if (!isFinite(number)) {
+  if (!Number.isFinite(number)) {
     throw new Error('number is not a number');
   }
 
-  let obj = {
+  return {
     sum(...args) {
-      let sum = 0;
-      for (let arg of args) {
-        sum += arg;
+      let result = number;
+      for (const arg of args) {
+        result += arg;
       }
-      return number + sum;
+      return result;
     },
     dif(...args) {
-      let dif = 0;
-      for (let arg of args) {
-        dif += arg;
+      let result = number;
+      for (const arg of args) {
+        result -= arg;
       }
-      return number - dif;
+      return result;
     },
     div(...args) {
-      let result = 0;
-      let middleRes = 0;
-      let finRes = 0;
+      let result = number;
 
-      for (let arg of args) {
-        if (arg == 0) {
+      for (const arg of args) {
+        if (arg === 0) {
           throw new Error('division by 0');
-        } else if (result == 0) {
-          result = number / arg;
-        } else if (middleRes == 0) {
-          middleRes = result / arg;
-        } else if (finRes == 0) {
-          finRes = middleRes / arg;
-        } else {
-          finRes /= arg;
         }
-      }
 
-      if (finRes == 0 && middleRes == 0) {
-        return result;
-      } else if (finRes == 0) {
-        return middleRes;
-      } else {
-        return finRes;
+        result /= arg;
       }
+      return result;
     },
     mul(...args) {
-      let result = 0;
-      let middleRes = 0;
-      let finRes = 0;
+      let result = number;
 
       for (let arg of args) {
-        if (result == 0) {
-          result = number * arg;
-        } else if (middleRes == 0) {
-          middleRes = result * arg;
-        } else if (finRes == 0) {
-          finRes = middleRes * arg;
-        } else {
-          finRes *= arg;
-        }
+        result *= arg;
       }
 
-      if (finRes == 0 && middleRes == 0) {
-        return result;
-      } else if (finRes == 0) {
-        return middleRes;
-      } else {
-        return finRes;
-      }
+      return result;
     },
   };
-
-  return obj;
 }
 
 /* При решении задач, постарайтесь использовать отладчик */
