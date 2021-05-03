@@ -21,15 +21,7 @@ function isAllTrue(array, fn) {
     throw new Error('fn is not a function');
   }
 
-  let isArray;
-
-  if (array instanceof Array) {
-    isArray = true;
-  } else {
-    isArray = false;
-  };
-
-  if (!isArray || array.length == 0) {
+  if (!(array instanceof Array) || array.length == 0) {
     throw new Error('empty array');
   }
 
@@ -62,15 +54,7 @@ function isSomeTrue(array, fn) {
     throw new Error('fn is not a function');
   }
 
-  let isArray;
-
-  if (array instanceof Array) {
-    isArray = true;
-  } else {
-    isArray = false;
-  };
-
-  if (!isArray || array.length == 0) {
+  if (!(array instanceof Array) || array.length == 0) {
     throw new Error('empty array');
   }
 
