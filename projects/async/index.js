@@ -20,6 +20,9 @@
  При клике на кнопку, процесс загрузки повторяется заново
  */
 
+import { doc } from "prettier";
+import { loadAndSortTowns } from "./functions";
+
 /*
  homeworkContainer - это контейнер для всех ваших домашних заданий
  Если вы создаете новые html-элементы и добавляете их на страницу, то добавляйте их только в этот контейнер
@@ -40,29 +43,7 @@ const homeworkContainer = document.querySelector('#app');
  https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json
  */
 function loadTowns() {
-  return new Promise((resolve) => {
-    async function getCities() {
-      let url = 'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json';
-
-      let response = await fetch(url);
-
-      let cities = await response.json();
-
-      cities.sort(function (a, b) {
-        if (a.name > b.name) {
-          return 1;
-        }
-        if (a.name < b.name) {
-          return -1;
-        }
-        return 0;
-      });
-
-      return cities;
-    }
-
-    resolve(getCities());
-  });
+  return loadAndSortTowns();
 }
 
 /*
@@ -93,58 +74,46 @@ const filterInput = homeworkContainer.querySelector('#filter-input');
 /* Блок с результатами поиска */
 const filterResult = homeworkContainer.querySelector('#filter-result');
 
-let towns;
-filterBlock.style.display = 'none';
-loadingFailedBlock.style.display = 'none';
+let towns = [];
 
-try {
+retryButton.addEventListener('click', () => {
+  tryToLoad();
+});
 
-  towns = loadTowns();
+filterInput.addEventListener('input', function () {
+  updateFilter(this.value);
+});
 
-  if (!towns) {
-    throw new Error;
+loadingFailedBlock.classList.add('hidden');
+filterBlock.classList.add('hidden');
+
+async function tryToLoad() {
+  try {
+    towns = await loadTowns();
+    loadingBlock.classList.add('hidden');
+    loadingFailedBlock.classList.add('hidden');
+    filterBlock.classList.remove('hidden');
+  } catch (e) {
+    loadingBlock.classList.add('hidden');
+    loadingFailedBlock.classList.remove('hidden');
   }
-
-  loadingBlock.style.display = 'none';
-  filterBlock.style.display = 'block';
-
-  filterInput.addEventListener('input', function () {
-    let matchesArray = [];
-    filterResult.innerHTML = '';
-
-    const word = filterInput.value;
-
-    if (!word) {
-      filterResult.style.display = 'none';
-    } else {
-      filterResult.style.display = 'block';
-    }
-
-    towns.then(function (towns) {
-      const townsArray = [...towns];
-
-      townsArray.forEach(el => {
-        if (isMatching(el.name, word)) {
-          matchesArray.push(el.name);
-        }
-      });
-      matchesArray.forEach((item) => {
-        const createTown = document.createElement('p');
-        filterResult.appendChild(createTown);
-        createTown.textContent = item;
-      });
-    });
-  });
-
-} catch (e) {
-  loadingBlock.style.display = 'none';
-  loadingFailedBlock.style.display = 'block';
-
-  retryButton.addEventListener('click', () => {
-    towns = loadTowns();
-  });
 }
 
+function updateFilter(filterValue) {
+  filterResult.innerHTML = '';
 
+  const fragment = document.createDocumentFragment();
+
+  for (const town of towns) {
+    if (filterValue && isMatching(town.name, filterValue)) {
+      const townDiv = document.createElement('div');
+      townDiv.textContent = town.name;
+      fragment.append(townDiv);
+    }
+  }
+  filterResult.append(fragment);
+}
+
+tryToLoad();
 
 export { loadTowns, isMatching };
