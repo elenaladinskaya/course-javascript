@@ -19,71 +19,43 @@ import './dnd.html';
 
 const homeworkContainer = document.querySelector('#app');
 
+function random(from, to) {
+  return parseInt(from + Math.random() * to - from);
+}
+
+let currentDrag;
+let startX = 0;
+let startY = 0;
+
 document.addEventListener('mousemove', (e) => {
-  let currentDrag;
-  if (e.target.classList.contains('draggable-div')) {
-    currentDrag = e.target;
-
-    currentDrag.onmousedown = function (event) {
-      const shiftX = event.clientX - currentDrag.getBoundingClientRect().left;
-      const shiftY = event.clientY - currentDrag.getBoundingClientRect().top;
-
-      moveAt(event.pageX, event.pageY);
-
-      function moveAt(pageX, pageY) {
-        currentDrag.style.left = pageX - shiftX + 'px';
-        currentDrag.style.top = pageY - shiftY + 'px';
-      }
-
-      function onMouseMove(event) {
-        moveAt(event.pageX, event.pageY);
-      }
-
-      document.addEventListener('mousemove', onMouseMove);
-
-      currentDrag.onmouseup = function () {
-        document.removeEventListener('mousemove', onMouseMove);
-        currentDrag.onmouseup = null;
-      };
-    };
-
-    currentDrag.ondragstart = function () {
-      return false;
-    };
+  if (currentDrag) {
+    currentDrag.style.top = e.clientY - startY + 'px';
+    currentDrag.style.left = e.clientX - startX + 'px';
   }
 });
 
 export function createDiv() {
   const div = document.createElement('div');
-  div.classList.add('draggable-div');
-  div.style.backgroundColor =
-    'rgb(' +
-    getRandomColor(0, 255) +
-    ', ' +
-    getRandomColor(0, 255) +
-    ', ' +
-    getRandomColor(0, 255) +
-    ')';
-  div.style.width = getRandomSize(50, 150) + 'px';
-  div.style.height = getRandomSize(50, 150) + 'px';
-  div.style.top = getRandomPosition(100) + '%';
-  div.style.left = getRandomPosition(100) + '%';
+  const minSize = 20;
+  const maxSize = 200;
+  const maxColor = 0xffffff;
+
+  div.className = 'draggable-div';
+  div.style.backgroundColor = '#' + random(0, maxColor).toString(16);
+  div.style.width = random(minSize, maxSize) + 'px';
+  div.style.height = random(minSize, maxSize) + 'px';
+  div.style.top = random(0, window.innerHeight) + 'px';
+  div.style.left = random(0, window.innerWidth) + 'px';
+
+  div.addEventListener('mousedown', (e) => {
+    currentDrag = div;
+    startX = e.offsetX;
+    startY = e.offsetY;
+  });
+
+  div.addEventListener('mouseup', () => (currentDrag = false));
 
   return div;
-}
-
-function getRandomColor(min, max) {
-  return Math.floor(Math.random() * (max - min)) + min;
-}
-
-function getRandomSize(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min;
-}
-
-function getRandomPosition(max) {
-  return Math.floor(Math.random() * max);
 }
 
 const addDivButton = homeworkContainer.querySelector('#addDiv');
